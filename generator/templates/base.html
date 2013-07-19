@@ -1,0 +1,57 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<html lang = "en">
+<head>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" href = "{% static 'generator/style.css' %}" />
+	<title>{% block title %} {% endblock %}</title>
+</head>
+
+<body>
+<div id="wrap">
+    {% block navbar %}
+    <div class="navbar">
+        <div class="navbar-inner">
+            <!--div class="container-fluid"-->
+                    <p class="navbar-text pull-right">
+                        {% if user.username %}
+                            {{user.username}} | <a href="/logout" class="navbar-link">logout</a>
+                        {% else %}
+                            <a href="/login" class="navbar-link">login</a>
+                            |
+                            <a href="/signup" class="navbar-link">signup</a>
+                        {% endif %}
+                    </p>
+                    <ul class="nav">
+                        <li class = ""><a href="/">THE WORLD</a></li>
+                        <li class = "{% if request.path == "/objects/" %} active {% endif %}"><a href="/objects">FULL OF OBJECTS</a></li>
+                        <li class = "{% if request.path == "/userquotes/" %} active {% endif %}"><a href="/userquotes">I</a></li>
+                        <li class = "{% if request.path == "/add/" %} active {% endif %}"><a href="/add">ADD MORE</a></li>
+                    </ul>
+            <!--/div-->
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block content %}
+    {% endblock %}
+
+    <div id="push"></div>
+</div>
+
+  <div id="footer">
+      <div class="container">
+        <p class="muted credit">Website by <a href="/about">Arthur Wang</a>.</p>
+      </div>
+    </div>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type"text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+    {% block js %}
+    {% endblock %}
+
+
+</body>
+
+</html>

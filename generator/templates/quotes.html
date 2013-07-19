@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container-fluid">
+        <div class="row-fluid">
+			<div class="span8 offset2" id="content">
+                <h1>{% block header %} {% endblock %}</h1>
+                {% block quotes %}
+					<div class="quotes" id="quotes">
+						{% for quote in quotes %}
+								<span><a class = "{{forloop.counter|divisibleby:2|yesno:"even,odd"}}" href = '/{{quote.text.id}}'>{{quote.quote}}</a></span>
+						{% endfor %}
+
+						<!--pagination navigation-->
+						{% if quotes.paginator.num_pages != 1 %}
+							<span>
+								<div class="pagination">
+        							{% if quotes.has_previous %}
+	            						<a href="?page={{ quotes.previous_page_number }}">previous</a>
+        							{% endif %}
+            						Page {{ quotes.number }} of {{ quotes.paginator.num_pages }}.
+        							{% if quotes.has_next %}
+		            					<a href="?page={{ quotes.next_page_number }}">next</a>
+        							{% endif %}
+        						</div>
+    						</span>
+    					{% endif %}
+					</div>
+				{% endblock %}
+
+           </div>
+	    </div>
+    </div>
+
+{% endblock %}
+
+
+{% block js %}
+	<script type="text/javascript">
+
+		function FadeIn( elem ) {
+			elem.delay()
+     			.fadeIn(
+               		function(){ FadeIn( elem.next() ); }
+             	);
+		}
+
+		$(function(){
+			$('#quotes span').hide();
+			FadeIn( $('#quotes span:first') );
+		});
+
+	</script>
+{% endblock %}

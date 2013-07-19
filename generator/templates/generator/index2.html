@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %} Uncreative {% endblock %}
+
+{% block navbar %} {% endblock %}
+
+
+
+{% block content %}		
+	<h2 class = "container" id="content">
+		The world is full <br>of 
+		<span><a href = '/objects'>objects</a></span>,
+		more <br>or less interesting; <br>
+		<span><a href = '/userquotes'>I</a></span>
+		do not wish to 
+		<span><a href = '/add'>add</a></span>
+		<br>any more.
+	</h2>
+{% endblock %}
+
+{% block js %}
+	<script type="text/javascript">
+		function FadeIn( elem ) {
+			elem.delay()
+     			.fadeIn(
+               		function(){ FadeIn( elem.next() ); }
+             	);
+		}
+
+		$(function(){
+			$('#content span').hide();
+			FadeIn( $('#content span:first') );
+		});
+
+	</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %} More or Less {% endblock %}
+
+{% block header %} Add More {% endblock %}
+{% block content %}
+	
+{% if user.is_authenticated %}
+<form method="post">
+	{% csrf_token %}
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span5 offset1">
+				<input type="hidden" name="text_id" value={{text_id}}>
+				<h1> Source </h1>
+				<!--<label>
+					<div>Choose a text</div>
+					<select>
+						<option value="">
+						<option> test 
+					</select>
+				</label>
+				<label>
+					or
+				</label>-->
+				<label>
+					<div>Paste a text (at least 500 characters)</div>
+					<textarea name="content">{{content}}</textarea>
+				</label>
+
+				<label>
+					<div>Title (optional)</div> 
+					<input type="text" name="title" value="{{title}}">
+				</label>
+
+				<label>
+					<div>Author (optional)</div> 
+					<input type="text" name="author" value="{{author}}">
+				</label>
+
+				<div class="error"> {{error}}</div>
+
+				<input type="submit" name = "generate" value = "Generate">
+			</div>
+			<div class="span5">
+				{% if quote %}
+				<label>
+					<h1>Quotation</h1>
+					<textarea name="quote">{{quote}}</textarea>
+				</label>
+				<input type="submit" name = "save" value = "Save">
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</form>
+{% else %}
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span8 offset2">
+				<p class="lead">Please <a href="/login">log in</a> or <a href="/signup">register</a> to generate and save texts.</p>
+			</div>
+		</div>
+	</div>
+{% endif %}
+{% endblock %}

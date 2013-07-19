@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %} Uncreative {% endblock %}
+
+{% block navbar %} {% endblock %}
+
+
+
+{% block content %}
+    <h4 class="container">
+    
+        <span>So they quote the sunset and the star, and do not make them theirs. Worse yet, they live as foreigners in </span>
+            the world
+        <span> of truth, and quote thoughts, and thus disown them (Emerson). The grass </span>
+            is full
+        <span>/And full of yourself (Stevens). By focusing on hidden details</span> 
+        of
+            <span> familiar </span>
+            <a href = "/objects">objects</a>,
+        <span> by exploring common place milieus under the ingenious guidance of the camera, the film, on the one hand, extends our comprehension of the necessities which rule our lives; on the other hand, it manages to assure us of an immense and unexpected field of action (Benjamin). If nostalgic cartoonists had never borrowed from Fritz the Cat, there would be no Ren & Stimpy Show; without the Rankin/Bass and Charlie Brown Christmas specials, there would be no South Park; and without The Flintstones —</span>
+        more or less
+        <span> The Honeymooners in cartoon loincloths — The Simpsons would cease to exist (Lethem). The mind of the mature poet differs from that of the immature one not precisely in any valuation of “personality,” not being necessarily more </span>
+            interesting,
+        <span> or having “more to say,” but rather by being a more finely perfected medium in which special, or very varied, feelings are at liberty to enter into new combinations. (Eliot) And of course the genius of Beethoven or Goethe had to be original: the noun originality, defined by the OED as "the fact or attribute of being primary, first hand: authenticity, genuineness," made its first appearance in 1776 (H. Swinburne's Travels in Spain): "One of the most valuable pictures in the world. </span>
+            <a href = "/userquotes">I</a> do not
+        <span> know how Amiconi came to doubt its originality" (Perloff). All the instincts, the loving, the grateful, the sensual, the defiant, the self-assertive, and independent--all are gratified in the </span>
+            wish to
+        <span> be the father of himself (Freud). I had questioned myself about the ways in which a book can be infinite. I could think of nothing other than a cyclic volume, a circular one. A book whose last page was identical with the first, a book which had the possibility of continuing indefinitely...I imagined as well a Platonic. hereditary work. transmitted from father to son, in which each new individual </span>
+            <a href="/add">add</a><span>s
+        a chapter or corrects with pious care the pages of his elders (Borges). Siegmund prevented him from saying </span>
+            any more<span>,
+        fearing that painful memories might return with excessive clarity (Hoffman).
+    </h4>
+
+
+    <!--
+    Quotations from:
+    the world:      "Quotation and Originality," by Ralph Waldon Emerson
+    is full:        "A Rabbit as King of the Ghosts" by Wallace Stevens
+    of objects:     "The Work of Art in the Age of Mechanical Reproduction," by Walter Benjamin
+    more or less:   "The Ecstasy of Influence: A Plagiarism" by Jonathan Lethem
+    interesting:    "Tradition and the Individual Talent," by T.S. Eliot
+    I do not:       Unoriginal Genius, by Marjorie Perloff
+    wish to:        "A Special Type of Choice of Object Made by Men (Contributions to the                   Psychology of Love I)," by Sigmund Freud (sentence also translated as: "In                  such cases they aim at expressing the subject’s wish to have his father                 as a son - that is, to have a son who is like his father.")
+    add:            "The Garden of Forking Paths," by Jorge Luis Borges
+    any more:       "The Sandman," by E.T.A. Hoffman
+
+                    Alternative quotation from Welcome to the Desert of the Real! by Slavoj Zizek:
+                    is there anything more monotonous than the Deleuzian poetry of contemporary life as the decentred proliferation of multitudes, of non-totalizable differences? What occludes (and thereby sustains) this monotony is the multiplicity of resignifi- cations and displacements to which the basic ideological texture is submitted.
+-->
+
+ <!-- Le styles -->
+    <link href="../assets/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+        h4.container {
+            text-align: justify;
+            max-width: 725px;
+        }
+        a {
+            color: green;
+            font-style: italic;
+        }
+        /* initialize faded text for browsers with JS disabled */
+        h4 > span {
+            opacity: .2;
+        }
+    </style>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $( "span").fadeTo(0, 1).delay(400).fadeTo(2000, .2)
+    </script>
+{% endblock %}
