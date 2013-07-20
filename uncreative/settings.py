@@ -170,7 +170,7 @@ LOGGING = {
     }
 }
 
-
+DATABASES = {}
 #for production:
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
