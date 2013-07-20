@@ -13,13 +13,12 @@
         	<input type="text" class="input-block-level" placeholder="Username" name = "username" value = {{username}}>
 
         	<input type="password" class="input-block-level" placeholder="Password" name = "password">
-        	
 			<input type="password" class="input-block-level" placeholder="Verify Password" name = "verify">
-        	
-
         	<button class="btn btn-large btn-primary" type="submit">Create Account</button>
+          {% if error %}<div class="alert alert-error">{{error}}</div>{% endif %}
       </form>
-
+      
+  </div>
       <!-- Le styles -->
     <link href="../assets/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">

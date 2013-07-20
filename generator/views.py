@@ -1,3 +1,4 @@
+#django
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
@@ -5,10 +6,12 @@ from django.http import HttpResponse
 from django.forms import ModelForm
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+#uncreative
+from models import Quotation, Text
+#python
 import re
 import logging
-from models import Quotation, Text
+from collections import namedtuple
 
 
 #homepage with douglas hueber quotation
@@ -23,7 +26,7 @@ def all_quotes(update = False):
 	key = 'all'
 	quotes = cache.get(key)
 	if quotes is None or update:
-		logging.error("DB Query")
+		logging.error("allquote DB Query")
 		quotes = Quotation.objects.all().order_by('-created')
 		quotes = list(quotes)
 		cache.set(key, quotes)
@@ -33,7 +36,7 @@ def user_quotes(user, update = False):
 	key = 'u'+str(user.pk)
 	quotes = cache.get(key)
 	if quotes is None or update:
-		logging.error("DB Query")
+		logging.error("userquote DB Query")
 		quotes = Quotation.objects.filter(user=user).order_by('-created')
 		quotes = list(quotes)
 		cache.set(key, quotes)
@@ -43,7 +46,7 @@ def text_quotes(text, update = False):
 	key = 'tq'+str(text.pk)
 	quotes = cache.get(key)
 	if quotes is None or update:
-		logging.error("DB Query")
+		logging.error("Textquote DB Query")
 		quotes = Quotation.objects.filter(text=text).order_by('-created')
 		quotes = list(quotes)
 		cache.set(key, quotes)
@@ -53,10 +56,38 @@ def get_text(text_id, update = False):
 	key = 't' + str(text_id)
 	text = cache.get(key)
 	if text is None or update:
-		logging.error("DB Query")
+		logging.error("Text DB Query")
 		text = get_object_or_404(Text, pk=text_id)
 		cache.set(key, text)
 	return text
+
+#cache of markov model dictionary associated with each text
+def cached_model(text_id, update = False):
+	key = 'm' + str(text_id)
+	model = cache.get(key)
+	if model is None or update:
+		logging.error("Model DB Query")
+		text = get_text(text_id)
+		content = text.content
+		model = Text.generatemodel(content)
+		cache.set(key, model)
+	return model
+
+TextInfo = namedtuple('TextInfo', 'id title author')
+#cache of text info -- no content, just titles, authors, and ids
+def text_info(update = False):
+	key = 'txtinfo'
+	info = cache.get(key)
+	if info is None or update:
+		logging.error("txt info db query")
+		texts = Text.objects.all().order_by('-created')
+		info = []
+		for text in texts:
+			textinfo = TextInfo(text.id, text.title, text.author)
+			info.append(textinfo)
+		cache.set(key, info)
+	return info
+
 
 def paginate(request, quotes):
 	paginator = Paginator(quotes, 5)
@@ -95,8 +126,10 @@ def permalink(request, text_id):
 #users must log in to generate and save quotations
 def add(request):
 	def render_form(content="", title="", author="", error="", quote = "", text_id=""):
+		# include text author, titles, and IDs for dropdown menu
+		texts = text_info()
 		return render(request, "generator/add.html", {'content': content, 'title': title, 'author': author,
-			'error': error, 'quote': quote, 'text_id': text_id})
+			'error': error, 'quote': quote, 'text_id': text_id, 'texts': texts})
 	if request.method == 'POST':
 		# Generate text based on user's input
 		if 'generate' in request.POST:
@@ -108,7 +141,9 @@ def add(request):
 				error = ("The text you submitted is only {number} character{pl} long.  Please \
 					submit a longer text.".format(number = len(content), pl = 's' if len(content)!=1 else ""))
 				return render_form(error = error)
-			quote = Text.generatequote(content, 50)
+			model = cached_model(text_id)
+			QLENGTH = 50
+			quote = Text.generatequote(content, QLENGTH, model)
 			return render_form(content = content, title = title, author = author, quote = quote, text_id = text_id)
 		# Save user's text and quotations
 		else:
@@ -124,6 +159,7 @@ def add(request):
 				text = Text.objects.create_text(content, title, author, request.user)
 				# update cache
 				get_text(text.pk, True)
+				text_info(True)
 			quote = Quotation.objects.create_quotation(quote, request.user, text)
 			text_quotes(text, True)
 			user_quotes(request.user, True)
@@ -153,21 +189,21 @@ PASS_RE = re.compile(r"^.{3,20}$")
 def valid_password(password):
     return password and PASS_RE.match(password)
 
-def error_check(username, password, verify):
+def error_check(username, password, verify=None):
 	error = ""
-	# error: username taken
-	try:
-		if User.objects.get(username=username):
-			error = "That username is already taken"
-			return error
-	except:
-		# error: invalid username or password
-		if not valid_username(username) or not valid_password(password):
-			error = "Please enter a valid username and password"
-		#error: passwords don't match
-		elif password != verify:
-			error = "Passwords don't match"
-		return error
+	#signup specific error
+	if verify is not None:
+		try:
+			if User.objects.get(username=username):
+				error = "That username is already taken.  Please choose another."
+				return error
+		except:
+			if password != verify:
+				error = "Passwords don't match."
+	# error: invalid username or password
+	if not valid_username(username) or not valid_password(password):
+		error = "Please enter a valid username and password."	
+	return error
 
 
 def signup(request):
@@ -192,8 +228,11 @@ def signup(request):
 	else:
 		if 'HTTP_REFERER' in request.META:
 			next_url = request.META.get('HTTP_REFERER')
+			# prevent a redirect loop between login and signup pages
+			if (next_url.find('/login') != -1 or next_url.find('/signup') != -1):
+				next_url = '/userquotes'
 		else:
-			next_url = "/objects"
+			next_url = "/userquotes"
 		if request.user.is_authenticated():
 			return redirect(next_url)
 		return render_form(next_url=next_url)
@@ -206,8 +245,8 @@ def userlogin(request):
 		username = request.POST.get('username')
 		password = request.POST.get('password')
 		next_url = request.POST.get('next_url')
-		if not username or not password:
-			error = "Please enter a username and a password"
+		error = error_check(username, password)
+		if error:
 			return render_form(username, error, next_url)
 		else:
 			user = authenticate(username=username, password=password)
@@ -215,13 +254,16 @@ def userlogin(request):
 				login(request, user)
 				return redirect(next_url)
 			else:
-				error = "Invalid username/password combination"
+				error = "Please enter a valid username and password."
 				return render_form(username, error, next_url)
 	else:
 		if 'HTTP_REFERER' in request.META:
 			next_url = request.META.get('HTTP_REFERER')
+			# prevent a redirect loop between login and signup pages
+			if (next_url.find('/login') != -1 or next_url.find('/signup') != -1):
+				next_url = '/userquotes'
 		else:
-			next_url = "/objects"
+			next_url = "/userquotes"
 		if request.user.is_authenticated():
 			return redirect(next_url)
 		return render_form(next_url=next_url)

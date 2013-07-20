@@ -2,33 +2,62 @@
 
 {% block title %} More or Less {% endblock %}
 
-{% block header %} Add More {% endblock %}
 {% block content %}
-	
 {% if user.is_authenticated %}
 <form method="post">
 	{% csrf_token %}
 	<div class="container-fluid">
+		<h1 style="text-align: center">
+				Generative Texts
+		</h1>
 		<div class="row-fluid">
 			<div class="span5 offset1">
 				<input type="hidden" name="text_id" value={{text_id}}>
-				<h1> Source </h1>
-				<!--<label>
-					<div>Choose a text</div>
-					<select>
-						<option value="">
-						<option> test 
-					</select>
-				</label>
-				<label>
-					or
-				</label>-->
-				<label>
-					<div>Paste a text (at least 500 characters)</div>
-					<textarea name="content">{{content}}</textarea>
-				</label>
+				<h2> Source </h2>
+				<div class="btn-group">
+					<a class = "btn {% if not request.GET.t %} disabled {% endif %}" href="/add"> Add New Source</a>
+                	<button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">Choose a Source Text <span class="caret"></span></button>
+                	<ul class="dropdown-menu">
+                		{% for text in texts %}
+                		<li><a href="/add/?t={{text.id}}">
 
-				<label>
+                			{% if text.title %}
+                				{{text.title}} 
+                			{% else %}
+                				Untitled Text
+                			{% endif %}
+                			{% if text.author %}
+                				by {{text.author}}
+                			{% endif %}
+                		</a></li>
+                		{% endfor %}
+                	</ul>
+
+                </div><!-- /btn-group -->
+
+                <!-- user is using an existing text-->
+                {% if request.GET.t %}
+                	{% if title %}
+               		<label>
+						<div>Title</div> 
+						<input type="text" name="title" value="{{title}}" readonly>
+					</label>
+
+					{% endif %}
+					{% if author %}
+					<label>
+						<div> Author </div> 
+						<input type="text" name="author" value="{{author}}" readonly>
+					</label>
+					{% endif %}
+					
+					<label>
+						<div>Text</div>
+						<textarea name="content" readonly>{{content}}</textarea>
+					</label>
+
+                {% else %}
+                <label>
 					<div>Title (optional)</div> 
 					<input type="text" name="title" value="{{title}}">
 				</label>
@@ -37,23 +66,32 @@
 					<div>Author (optional)</div> 
 					<input type="text" name="author" value="{{author}}">
 				</label>
+				<label>
+						<div>Enter a text (paste at least 500 characters)</div>
+					<textarea name="content">{{content}}</textarea>
+				</label>
+				{% endif %}
+				
 
-				<div class="error"> {{error}}</div>
+				{% if error %}<div class="alert alert-error"> {{error}}</div>{% endif %}
 
-				<input type="submit" name = "generate" value = "Generate">
+				<button type="submit" class="btn btn-inverse" name="generate">
+					<i class="icon-random icon-white"></i> Generate
+				</button>
 			</div>
 			<div class="span5">
 				{% if quote %}
 				<label>
-					<h1>Quotation</h1>
+					<h2>Extract</h2>
 					<textarea name="quote">{{quote}}</textarea>
 				</label>
-				<input type="submit" name = "save" value = "Save">
+				<input type="submit" class="btn btn-inverse" name = "save" value = "Save">
 				{% endif %}
 			</div>
 		</div>
 	</div>
 </form>
+<!-- user not logged in -->
 {% else %}
 	<div class="container-fluid">
 		<div class="row-fluid">

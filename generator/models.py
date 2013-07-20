@@ -8,23 +8,26 @@ import string
 
 # character based k-order markov model
 class MarkovModel:
-	def __init__(self, text, k):
-		self.model = {}
+	def __init__(self, content, k, model={}):
 		self.order = k
-		circulartext = text + text[:k]
+		if model:
+			self.model = model
+		else:
+			self.model = {}
+			circulartext = content + content[:k]
 
-		for i in range(len(text)):
-			key = circulartext[i:i+k]
-			nextchar = circulartext[i+k]
-			#insert new key or update value
-			if key not in self.model:
-				self.model[key] = {}
-				self.model[key][nextchar] = 1
-			else:
-				if nextchar not in self.model[key]:
+			for i in range(len(content)):
+				key = circulartext[i:i+k]
+				nextchar = circulartext[i+k]
+				#insert new key or update value
+				if key not in self.model:
+					self.model[key] = {}
 					self.model[key][nextchar] = 1
 				else:
-					self.model[key][nextchar] += 1
+					if nextchar not in self.model[key]:
+						self.model[key][nextchar] = 1
+					else:
+						self.model[key][nextchar] += 1
 
 	def inputcheck(self, kgram, char=None):
 		if len(kgram) != self.order:
@@ -79,14 +82,14 @@ class Text(models.Model):
 	def __unicode__(self):
 		return self.content[:50]
 
-
+	# Markov Chain Text Generator
 	@staticmethod
-	def generate(order, outputlength, text):
-		model = MarkovModel(text, order)
+	def generate(order, outputlength, content, cachedmodel={}):
+		model = MarkovModel(content, order, cachedmodel)
 
 		#semi-randomly start output with a capital letter
-		rand=random.randrange(len(text))
-		kgram = (text+text[:order])[rand:rand+order]
+		rand=random.randrange(len(content))
+		kgram = (content+content[:order])[rand:rand+order]
 		# chain kgrams until beginning with a capital letter
 		# limit this process to 100 iterations before going to a default
 		for i in range(100):
@@ -96,7 +99,7 @@ class Text(models.Model):
 				nextchar = model.random(kgram)
 				kgram = kgram[1:] + nextchar
 		if not kgram[0].isupper():
-			kgram=text[:order]
+			kgram=content[:order]
 
 		# build output text
 		output = kgram
@@ -124,9 +127,14 @@ class Text(models.Model):
 			return output + '.'
 
 	@staticmethod
-	def generatequote(text, length):
+	def generatequote(content, length, cachedmodel={}):
 		ORDER = 6
-		return Text.generate(ORDER, length, text)
+		return Text.generate(ORDER, length, content, cachedmodel)
+
+	@staticmethod
+	def generatemodel(content):
+		ORDER = 6
+		return MarkovModel(content, ORDER).model
 
 
 class QuotationManager(models.Manager):

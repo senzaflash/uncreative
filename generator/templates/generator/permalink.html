@@ -8,7 +8,7 @@
 {% block content %}
 
     <div class="container-fluid">
-        <div class="row-fluid" id="permalink">
+        <div class="row-fluid">
         	<div class="span5 offset1">
         		<h1> 
 					{{text.title}} 
@@ -16,7 +16,7 @@
 				<h4>
 					{{text.author}}
 				</h4>
-				<a href = "/add?t={{text.id}}"> Generate more texts based on this source</a><br><br>
+				<a class="btn btn-inverse "href="/add?t={{text.id}}"> Generate more texts from this source</a><br><br>
 				<!--<form action="/add" method = "get">
 					<button href="/?t=2">test</button>
 				</form>-->
@@ -26,7 +26,7 @@
         	</div>
 
 			<div class="span5">
-                <h1>Quotes</h1>
+                <h1>Derivations</h1>
                	<div class="fullquotes">
                 	{% for quote in quotes %}
 						<div class="permaquote">

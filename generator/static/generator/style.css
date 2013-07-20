@@ -1,3 +1,4 @@
+/*floating footer styling*/
  html,
       body {
         height: 100%;
@@ -36,6 +37,7 @@
   text-align:right;
 }
 
+
 body {
 	font-family: georgia;
 }
@@ -48,8 +50,18 @@ h2.container {
     margin-top:100px;
 }
 
-a.odd {color:#005580;text-decoration:none;}
-a.odd:hover{color:#0088cc;text-decoration:underline;}
+/*invert link colors for odd links*/
+a.odd {
+  color:#005580;text-decoration:none;
+}
+a.odd:hover{
+  color:#0088cc;text-decoration:underline;
+}
+/* restore default font for button links*/
+a.btn {
+  font-family: "Helvetica Neue";
+}
+
 
 div.container-fluid {
 	padding-top:50px;
@@ -57,7 +69,7 @@ div.container-fluid {
 
 textarea {
 	width: 300px;
-	height: 250px;
+	height: 225px;
 }
 
 div.pagination {
@@ -66,15 +78,17 @@ div.pagination {
 }
 
 div.fulltext {
-	height:500px;
+	max-height:400px;
 	overflow:auto;
 }
-/* align permalink quotations with source text */
 div.fullquotes {
-	height: 570px;
+	max-height: 480px;
 	overflow:auto;
 }
 
 div.permaquote {
 	margin-bottom: 25px;
+}
+div.btn-group{
+  margin-bottom: 10px;
 }
