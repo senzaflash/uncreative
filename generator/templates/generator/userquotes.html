@@ -1,22 +1,30 @@
 {% extends "quotes.html"%}
 
-{% block title %} Urtexts {% endblock %}
+{% block title %} 
+	{% if username %}
+		{{username}}
+	{% else %} Urtexts
+	{% endif %}
+{% endblock %}
 
 
-{% block header %} 
-	{% if quotes %}
-	These are <em>ur</em>texts 
+{% block header %}
+	{% if username and quotes %}
+		{{username}}'s texts
+	{% elif quotes %}
+		These are <em>ur</em>texts 
+	{% elif username %}
+		{{username}} has created nothing.
 	{% else %}
-	You've created nothing.
+		You've created nothing.
 	{% endif %}
 {% endblock %}
 
 {% block quotes %}
 	{% if quotes %}
 		{{block.super}}
-	{% elif user.is_authenticated %}
-		<p class="lead">Begin <a href="/add">adding</a> texts.</p>
+	{% elif username %}
 	{% else %}
-		<p class="lead">Please <a href="/login">log in</a> or <a href="/signup">register</a> to generate and save texts.</p>
+		<p class="lead">Begin <a href="/add">adding</a> texts.</p>
 	{% endif %}
 {% endblock %}

@@ -8,6 +8,8 @@ import string
 
 # character based k-order markov model
 class MarkovModel:
+	#constructor creates a kgram dictionary
+	#based on a text or a cached dictionary
 	def __init__(self, content, k, model={}):
 		self.order = k
 		if model:
@@ -52,6 +54,7 @@ class MarkovModel:
 			return self.model[kgram][char]
 
 	# generates a random character to follow kgram based on frequencies in the original text
+	# one call is one iteration of a Markov chain.
 	def random(self, kgram):
 		self.inputcheck(kgram)
 		freq = self.frequency(kgram)
@@ -70,7 +73,7 @@ class TextManager(models.Manager):
 		newtext = self.create(content = content, title = title, author = author, user = user)
 		return newtext
 
-# full texts, source for generated text
+# full text model object, source for generated text
 class Text(models.Model):
 	content = models.TextField()
 	created = models.DateTimeField(auto_now_add=True)
@@ -84,14 +87,15 @@ class Text(models.Model):
 
 	# Markov Chain Text Generator
 	@staticmethod
-	def generate(order, outputlength, content, cachedmodel={}):
+	def generate(order, minlength, content, cachedmodel={}):
 		model = MarkovModel(content, order, cachedmodel)
 
-		#semi-randomly start output with a capital letter
+		# ad hoc method for choosing a starting point for output text
+		# (semi-randomly start output with a capital letter)
 		rand=random.randrange(len(content))
 		kgram = (content+content[:order])[rand:rand+order]
-		# chain kgrams until beginning with a capital letter
-		# limit this process to 100 iterations before going to a default
+		# chain kgrams until finding one that starts with a capital letter
+		# limit this process to 100 iterations before reverting to default
 		for i in range(100):
 			if kgram[0].isupper():
 				break
@@ -111,20 +115,31 @@ class Text(models.Model):
 			if order !=0:
 				kgram = kgram[1:] + nextchar
 			i += 1
-			#break conditions
-			if i >= outputlength:
+			#continue until end of sentence, 
+			if i >= minlength:
 				if nextchar == ('.' or '!' or '?'):
 					break
 				#cut off too-long sentences, unpunctuated blocks
-				elif nextchar == '\n' and i >= outputlength * 5:
+				elif nextchar == '\n' and i >= minlength * 3:
 					break
-		# clean output -- to do: remove unpaired punctuation
+				elif i >= minlength * 6:
+					break
+		# clean output
+
+		# remove unpaired quotation marks
+		pattern = r'(\"(?=\S)[^\"]*(?<=\S)\")|\"'
+		output = re.sub(pattern, lambda m: m.group(1) or '', output)
+		# remove unpaired parentheses
+		# remove unpaired single quotes, leaving apostrophes intact
 		if output[-1] == ('.' or '!' or '?'):
 			return output
 		else:
 			while output[-1] not in string.letters:
+				if output[-1] == ('.' or '!' or '?'):
+					return output
 				output = output[:-1]
 			return output + '.'
+
 
 	@staticmethod
 	def generatequote(content, length, cachedmodel={}):
@@ -144,7 +159,6 @@ class QuotationManager(models.Manager):
 
 class Quotation(models.Model):
 	quote = models.TextField()
-	# parent/source text -- leave option to directly input quotations
 	user = models.ForeignKey(User)
 	created = models.DateTimeField(auto_now_add=True)
 	text = models.ForeignKey(Text, blank = True, null = True)

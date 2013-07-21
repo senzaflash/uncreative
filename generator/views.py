@@ -21,6 +21,7 @@ def index(request):
 def index2(request):
 	return render(request, "generator/index2.html")
 
+
 #cache quotations, texts, and markov models
 def all_quotes(update = False):
 	key = 'all'
@@ -41,6 +42,15 @@ def user_quotes(user, update = False):
 		quotes = list(quotes)
 		cache.set(key, quotes)
 	return quotes
+
+def user_by_username(username, update = False):
+	key = 'uname' + username
+	user = cache.get(key)
+	if user is None or update:
+		logging.error("user by name")
+		user = get_object_or_404(User, username=username)
+		cache.set(key, user)
+	return user
 
 def text_quotes(text, update = False):
 	key = 'tq'+str(text.pk)
@@ -73,8 +83,9 @@ def cached_model(text_id, update = False):
 		cache.set(key, model)
 	return model
 
-TextInfo = namedtuple('TextInfo', 'id title author')
 #cache of text info -- no content, just titles, authors, and ids
+# for add.html page dropdown menu
+TextInfo = namedtuple('TextInfo', 'id title author')
 def text_info(update = False):
 	key = 'txtinfo'
 	info = cache.get(key)
@@ -88,7 +99,7 @@ def text_info(update = False):
 		cache.set(key, info)
 	return info
 
-
+#pagination helper method
 def paginate(request, quotes):
 	paginator = Paginator(quotes, 5)
 	page = request.GET.get('page')
@@ -100,38 +111,79 @@ def paginate(request, quotes):
 		quotes=paginator.page(paginator.num_pages)
 	return quotes
 
-# main page -- displays all quotations
+# main page: displays all quotations
 def objects(request):
-	quotes = all_quotes()
-	quotes = paginate(request, quotes)
-	return render(request, "generator/allquotes.html", {'quotes': quotes})
-
-# userpage - same as main, but shows only user's quotations
-def userquotes(request):
 	if request.user.is_authenticated():
-		quotes = user_quotes(request.user)
+		quotes = all_quotes()
 		quotes = paginate(request, quotes)
-		return render(request, "generator/userquotes.html", {'quotes': quotes})
+		return render(request, "generator/allquotes.html", {'quotes': quotes})
+
+	# redirect if user isn't logged in -- could potentially be DRYed
 	else:
-		return render(request, "generator/userquotes.html")
+		next = '/login/?next=/objects'
+		if 'HTTP_REFERER' in request.META:
+			if '/signup' in request.META.get('HTTP_REFERER'):
+				next = '/signup/?next=/objects'
+		return redirect(next)
+
+# userpage: same as main, but shows quotations submitted by a particular user
+# defaults to user's own page
+def userquotes(request, username=""):
+	if request.user.is_authenticated():
+		if username == request.user.username:
+			return redirect('/objects/urtexts')
+
+		if username:
+			user = user_by_username(username)
+		else:
+			user = request.user
+		quotes = user_quotes(user)
+		quotes = paginate(request, quotes)
+		return render(request, "generator/userquotes.html", {'quotes': quotes, 'username': username})
+
+	#redirect if user isn't logged in
+	else:
+		next = '/login/?next=/objects/urtexts/'
+		if 'HTTP_REFERER' in request.META:
+			if '/signup' in request.META.get('HTTP_REFERER'):
+				next = '/signup/?next=/objects/urtexts/'
+		if username:
+			next += username
+		return redirect(next)
 
 # permalink page for text and its children
 def permalink(request, text_id):
-	text = get_text(text_id)
-	quotes = text_quotes(text)
-	return render(request, "generator/permalink.html", {'text': text, 'quotes': quotes})
+	if request.user.is_authenticated():
+		text = get_text(text_id)
+		quotes = text_quotes(text)
+		return render(request, "generator/permalink.html", {'text': text, 'quotes': quotes})
+
+	# redirect if user isn't logged in
+	else:
+		next = '/login?next=/objects/%s' %str(text_id)
+		if 'HTTP_REFERER' in request.META:
+			if '/signup' in request.META.get('HTTP_REFERER'):
+				next = '/signup/?next=/objects/%s' %str(text_id)
+		return redirect(next)
 
 
 #page for generating random quotations based on texts.
-#users must log in to generate and save quotations
 def add(request):
+	if not request.user.is_authenticated():
+		next = '/login/?next=/add'
+		if 'HTTP_REFERER' in request.META:
+			if '/signup' in request.META.get('HTTP_REFERER'):
+				next = '/signup/?next=/add'
+		return redirect(next)
+
 	def render_form(content="", title="", author="", error="", quote = "", text_id=""):
 		# include text author, titles, and IDs for dropdown menu
 		texts = text_info()
 		return render(request, "generator/add.html", {'content': content, 'title': title, 'author': author,
 			'error': error, 'quote': quote, 'text_id': text_id, 'texts': texts})
+
 	if request.method == 'POST':
-		# Generate text based on user's input
+		# Generate text based on user's input (left side of form)
 		if 'generate' in request.POST:
 			content = request.POST.get('content')
 			author = request.POST.get('author')
@@ -141,11 +193,16 @@ def add(request):
 				error = ("The text you submitted is only {number} character{pl} long.  Please \
 					submit a longer text.".format(number = len(content), pl = 's' if len(content)!=1 else ""))
 				return render_form(error = error)
-			model = cached_model(text_id)
-			QLENGTH = 50
-			quote = Text.generatequote(content, QLENGTH, model)
+			# use a Markov chain to generate a random output based on the input text
+			MINLENGTH = 50
+			if text_id:
+				model = cached_model(text_id)
+				quote = Text.generatequote(content, MINLENGTH, model)
+			else:
+				quote = Text.generatequote(content, MINLENGTH)
 			return render_form(content = content, title = title, author = author, quote = quote, text_id = text_id)
-		# Save user's text and quotations
+
+		# Save user's text and quotations (right side of form)
 		else:
 		 	content = request.POST.get('content')
 			author = request.POST.get('author')
@@ -166,19 +223,20 @@ def add(request):
 			all_quotes(True)
 			return redirect('/objects')
 	else:
+		# generate from existing text
 		if request.GET.get('t'):
 			text_id=request.GET.get('t')
 			text = get_object_or_404(Text, pk=text_id)
 			content = text.content
 			author = text.author
 			title = text.title
+		# blank form for adding new text
 		else:
 			content = ""
 			text_id = ""
 			title = ""
 			author = ""
 		return render_form(content, title, author, text_id=text_id)
-
 
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
@@ -209,7 +267,6 @@ def error_check(username, password, verify=None):
 def signup(request):
 	def render_form(username="", error="", next_url="/"):
 		return render(request, "generator/signup.html", {'username': username, 'error': error, 'next_url': next_url})
-
 	if (request.POST):
 		username = request.POST.get('username')
 		password = request.POST.get('password')
@@ -226,13 +283,10 @@ def signup(request):
 			login(request, user)
 			return redirect(next_url)
 	else:
-		if 'HTTP_REFERER' in request.META:
-			next_url = request.META.get('HTTP_REFERER')
-			# prevent a redirect loop between login and signup pages
-			if (next_url.find('/login') != -1 or next_url.find('/signup') != -1):
-				next_url = '/userquotes'
+		if request.GET.get('next'):
+			next_url=request.GET.get('next')
 		else:
-			next_url = "/userquotes"
+			next_url = "/objects"
 		if request.user.is_authenticated():
 			return redirect(next_url)
 		return render_form(next_url=next_url)
@@ -257,23 +311,17 @@ def userlogin(request):
 				error = "Please enter a valid username and password."
 				return render_form(username, error, next_url)
 	else:
-		if 'HTTP_REFERER' in request.META:
-			next_url = request.META.get('HTTP_REFERER')
-			# prevent a redirect loop between login and signup pages
-			if (next_url.find('/login') != -1 or next_url.find('/signup') != -1):
-				next_url = '/userquotes'
+		if request.GET.get('next'):
+			next_url=request.GET.get('next')
 		else:
-			next_url = "/userquotes"
+			next_url = "/objects"
 		if request.user.is_authenticated():
 			return redirect(next_url)
 		return render_form(next_url=next_url)
 
 def userlogout(request):
 	logout(request)
-	if 'HTTP_REFERER' in request.META:
-		return redirect(request.META.get('HTTP_REFERER'))
-	else:
-		return redirect('/')
+	return redirect('/')
 
 def about(request):
 	return render(request, "generator/about.html")

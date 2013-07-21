@@ -9,7 +9,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-'''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -28,7 +28,8 @@ CACHES = {
         'LOCATION': '127.0.0.1:11211',
     }
 }
-'''
+
+
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
@@ -135,7 +136,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'generator',
@@ -170,9 +171,10 @@ LOGGING = {
     }
 }
 
-DATABASES = {}
+'''
 #for production:
 # Parse database configuration from $DATABASE_URL
+DATABASES = {}
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
 
@@ -205,3 +207,4 @@ CACHES = {
     'OPTIONS': { 'tcp_nodelay': True }
   }
 }
+'''

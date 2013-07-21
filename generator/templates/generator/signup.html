@@ -10,11 +10,12 @@
 			{% csrf_token %}
         	<h2 class="form-signup-heading">Create an Account</h2>
           <input type="hidden" name="next_url" value = {{next_url}}>
-        	<input type="text" class="input-block-level" placeholder="Username" name = "username" value = {{username}}>
+        	<input type="text" class="input-block-level" placeholder="Username (3-20 characters)" name = "username" value = {{username}}>
 
-        	<input type="password" class="input-block-level" placeholder="Password" name = "password">
+        	<input type="password" class="input-block-level" placeholder="Password (3-20 characters)" name = "password">
 			<input type="password" class="input-block-level" placeholder="Verify Password" name = "verify">
         	<button class="btn btn-large btn-primary" type="submit">Create Account</button>
+          <div><h5>Already have an account? <a href="/login">Log in.</a></h5></div>
           {% if error %}<div class="alert alert-error">{{error}}</div>{% endif %}
       </form>
       

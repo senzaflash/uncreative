@@ -3,12 +3,11 @@
 {% block title %} More or Less {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated %}
 <form method="post">
 	{% csrf_token %}
 	<div class="container-fluid">
 		<h1 style="text-align: center">
-				Generative Texts
+				Voluble Texts
 		</h1>
 		<div class="row-fluid">
 			<div class="span5 offset1">
@@ -91,14 +90,4 @@
 		</div>
 	</div>
 </form>
-<!-- user not logged in -->
-{% else %}
-	<div class="container-fluid">
-		<div class="row-fluid">
-			<div class="span8 offset2">
-				<p class="lead">Please <a href="/login">log in</a> or <a href="/signup">register</a> to generate and save texts.</p>
-			</div>
-		</div>
-	</div>
-{% endif %}
 {% endblock %}
