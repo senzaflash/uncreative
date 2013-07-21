@@ -9,7 +9,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -28,7 +28,7 @@ CACHES = {
         'LOCATION': '127.0.0.1:11211',
     }
 }
-
+'''
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -171,8 +171,8 @@ LOGGING = {
     }
 }
 
-'''
-#for production:
+
+# uncomment for production:
 # Parse database configuration from $DATABASE_URL
 DATABASES = {}
 import dj_database_url
@@ -207,4 +207,3 @@ CACHES = {
     'OPTIONS': { 'tcp_nodelay': True }
   }
 }
-'''
