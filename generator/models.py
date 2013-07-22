@@ -134,7 +134,7 @@ class Text(models.Model):
 		if output[-1] == ('.' or '!' or '?'):
 			return output
 		else:
-			while output[-1] not in string.letters:
+			while output[-1] not in string.letters and len(output) > 0:
 				if output[-1] == ('.' or '!' or '?'):
 					return output
 				output = output[:-1]

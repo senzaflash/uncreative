@@ -1,14 +1,13 @@
 # Django settings for uncreative project.
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+#DEBUG = True
+#TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
 MANAGERS = ADMINS
-
 '''
 DATABASES = {
     'default': {

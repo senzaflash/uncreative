@@ -10,6 +10,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from models import Quotation, Text
 #python
 import re
+import random
 import logging
 from collections import namedtuple
 
