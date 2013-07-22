@@ -1,9 +1,9 @@
 # Django settings for uncreative project.
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+#DEBUG = True
+#TEMPLATE_DEBUG = DEBUG
 
-#DEBUG = False
+DEBUG = False
 
 
 ADMINS = (
