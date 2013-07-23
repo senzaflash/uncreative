@@ -227,7 +227,7 @@ def add(request):
 		# generate from existing text
 		if request.GET.get('t'):
 			text_id=request.GET.get('t')
-			text = get_object_or_404(Text, pk=text_id)
+			text = get_text(text_id)
 			content = text.content
 			author = text.author
 			title = text.title
