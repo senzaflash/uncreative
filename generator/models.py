@@ -7,7 +7,7 @@ import string
 
 
 # character based k-order markov model
-class MarkovModel:
+class MarkovModel(object):
 	#constructor creates a kgram dictionary
 	#based on a text or a cached dictionary
 	def __init__(self, content, k, model={}):
@@ -86,6 +86,8 @@ class Text(models.Model):
 		return self.content[:50]
 
 	# Markov Chain Text Generator
+	# text generator functions are static methods because they might be called
+	# before text object is generated
 	@staticmethod
 	def generate(order, minlength, content, cachedmodel={}):
 		model = MarkovModel(content, order, cachedmodel)
@@ -139,13 +141,10 @@ class Text(models.Model):
 					return output
 				output = output[:-1]
 			return output + '.'
-
-
 	@staticmethod
 	def generatequote(content, length, cachedmodel={}):
 		ORDER = 6
 		return Text.generate(ORDER, length, content, cachedmodel)
-
 	@staticmethod
 	def generatemodel(content):
 		ORDER = 6
