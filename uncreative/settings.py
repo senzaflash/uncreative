@@ -1,9 +1,9 @@
 # Django settings for uncreative project.
 
-#DEBUG = True
-#TEMPLATE_DEBUG = DEBUG
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
 
-DEBUG = False
+#DEBUG = False
 
 
 ADMINS = (
@@ -11,7 +11,7 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-'''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -30,7 +30,7 @@ CACHES = {
         'LOCATION': '127.0.0.1:11211',
     }
 }
-'''
+
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -67,7 +67,8 @@ MEDIA_ROOT = ''
 # trailing slash.
 # Examples: "http://example.com/media/", "http://media.example.com/"
 MEDIA_URL = ''
-'''
+
+
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
@@ -85,7 +86,7 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     '/Users/Arthur/Desktop/uncreativewriting/uncreative/generator/static/generator',
 )
-'''
+
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
@@ -94,8 +95,8 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '&yizb915*m$dbn6cynt#daqwoy0@3%&www6g%k!a$o#pyi$l6&'
+#secret key
+from settings_secret import *
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

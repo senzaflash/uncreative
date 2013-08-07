@@ -170,19 +170,15 @@ def permalink(request, text_id):
 
 #page for generating random quotations based on texts.
 def add(request):
-	if not request.user.is_authenticated():
-		next = '/login/?next=/add'
-		if 'HTTP_REFERER' in request.META:
-			if '/signup' in request.META.get('HTTP_REFERER'):
-				next = '/signup/?next=/add'
-		return redirect(next)
+
 
 	def render_form(content="", title="", author="", error="", quote = "", text_id=""):
 		# include text author, titles, and IDs for dropdown menu
 		texts = text_info()
 		return render(request, "generator/add.html", {'content': content, 'title': title, 'author': author,
 			'error': error, 'quote': quote, 'text_id': text_id, 'texts': texts})
-
+	if not request.user.is_authenticated():
+		return render_form()
 	if request.method == 'POST':
 		# Generate text based on user's input (left side of form)
 		if 'generate' in request.POST:
