@@ -1,6 +1,6 @@
 # Django settings for uncreative project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 #DEBUG = False
