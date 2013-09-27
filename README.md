@@ -10,7 +10,7 @@ Quotation Sources
 
 "The world is full of objects, more or less interesting; I do not wish to add any more" - Douglas Huebler
 
-  - the world: "Quotation and Originality," by Ralph Waldon Emerson
+  - the world: "Quotation and Originality," by Ralph Waldo Emerson
   - is full: "A Rabbit as King of the Ghosts" by Wallace Stevens
   - of objects: "The Work of Art in the Age of Mechanical Reproduction," by Walter Benjamin
   - more or less: "The Ecstasy of Influence: A Plagiarism" by Jonathan Lethem
